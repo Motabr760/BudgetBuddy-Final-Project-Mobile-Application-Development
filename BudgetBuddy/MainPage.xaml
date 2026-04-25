@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:charts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             xmlns:models="clr-namespace:BudgetBuddy.Models"
+             x:Class="BudgetBuddy.Views.MainPage"
+             Title="Dashboard">
+
+    <Grid>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <!-- Balance card -->
+                <Border Padding="20"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                        StrokeThickness="1"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12"/>
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Current Balance"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"/>
+                        <Label Text="{Binding Balance, StringFormat='{0:C}'}"
+                               FontSize="36"
+                               FontAttributes="Bold"/>
+                        <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Income" FontSize="12"/>
+                                <Label Text="{Binding TotalIncome, StringFormat='{0:C}'}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=Green, Dark=LightGreen}"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Expenses" FontSize="12"/>
+                                <Label Text="{Binding TotalExpenses, StringFormat='{0:C}'}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=Crimson, Dark=LightCoral}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Spending chart -->
+                <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                    <Label Grid.Column="0"
+                           Text="Spending by Category"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="1"
+                            Text="Refresh"
+                            FontSize="12"
+                            Padding="12,6"
+                            HeightRequest="36"
+                            Command="{Binding RefreshCommand}"/>
+                </Grid>
+                <Border Padding="10"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                        StrokeThickness="1">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12"/>
+                    </Border.StrokeShape>
+                    <Grid HeightRequest="240">
+                        <charts:ChartView Chart="{Binding SpendingChart}" IsVisible="{Binding HasExpenses}"/>
+                        <Label Text="No expenses yet. Tap + to add one."
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               IsVisible="{Binding HasExpenses, Converter={StaticResource InvertBoolConverter}}"/>
+                    </Grid>
+                </Border>
+
+                <!-- Recent transactions -->
+                <Label Text="Recent Transactions" FontSize="18" FontAttributes="Bold"/>
+
+                <Label Text="No transactions yet."
+                       IsVisible="{Binding HasTransactions, Converter={StaticResource InvertBoolConverter}}"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"/>
+
+                <CollectionView ItemsSource="{Binding Transactions}"
+                                IsVisible="{Binding HasTransactions}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Transaction">
+                            <Border Padding="12"
+                                    Margin="0,4"
+                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                    StrokeThickness="1">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+                                    <VerticalStackLayout Grid.Column="0">
+                                        <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Category}" FontSize="12"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"/>
+                                        <Label Text="{Binding Date, StringFormat='{0:MMM d, yyyy}'}" FontSize="11"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray400}}"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Amount, StringFormat='{0:C}'}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center"/>
+                                    <Button Grid.Column="2"
+                                            Text="Edit"
+                                            FontSize="12"
+                                            Padding="8,4"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditTransactionCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Grid.Column="3"
+                                            Text="Delete"
+                                            FontSize="12"
+                                            Padding="8,4"
+                                            BackgroundColor="Crimson"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteTransactionCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- spacer so floating button doesn't overlap last item -->
+                <BoxView HeightRequest="80" BackgroundColor="Transparent"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Floating add button -->
+        <Button Text="+"
+                FontSize="28"
+                FontAttributes="Bold"
+                WidthRequest="60"
+                HeightRequest="60"
+                CornerRadius="30"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,20,20"
+                Command="{Binding AddTransactionCommand}"/>
+
+    </Grid>
+
+</ContentPage>

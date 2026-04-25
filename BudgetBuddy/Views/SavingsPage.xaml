@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:BudgetBuddy.Models"
+             x:Class="BudgetBuddy.Views.SavingsPage"
+             Title="Savings">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+
+            <Label Text="Savings Goals" FontSize="24" FontAttributes="Bold"/>
+
+            <Border Padding="16"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                    StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Add a new goal" FontSize="14" FontAttributes="Bold"/>
+                    <Entry Placeholder="Goal title (e.g. Emergency Fund)" Text="{Binding Title}"/>
+                    <Entry Placeholder="Target amount" Keyboard="Numeric" Text="{Binding TargetAmount}"/>
+                    <Entry Placeholder="Current amount (optional)" Keyboard="Numeric" Text="{Binding CurrentAmount}"/>
+                    <Button Text="Add Goal" Command="{Binding AddGoalCommand}"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="You don't have any goals yet."
+                   IsVisible="{Binding HasGoals, Converter={StaticResource InvertBoolConverter}}"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"/>
+
+            <CollectionView ItemsSource="{Binding Goals}"
+                            IsVisible="{Binding HasGoals}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:SavingsGoal">
+                        <Border Padding="14"
+                                Margin="0,4"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                StrokeThickness="1">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="{Binding Title}" FontSize="18" FontAttributes="Bold"/>
+                                <Label Text="{Binding ProgressText}" FontSize="13"/>
+                                <!-- In-progress bar -->
+                                <ProgressBar Progress="{Binding Progress}"
+                                             HeightRequest="8"
+                                             IsVisible="{Binding IsGoalReached, Converter={StaticResource InvertBoolConverter}}"/>
+                                <!-- Reached bar (green) -->
+                                <ProgressBar Progress="{Binding Progress}"
+                                             HeightRequest="8"
+                                             IsVisible="{Binding IsGoalReached}"
+                                             ProgressColor="{AppThemeBinding Light=Green, Dark=LightGreen}"/>
+                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8" Margin="0,6,0,0">
+                                    <Button Grid.Column="0"
+                                            Text="Contribute"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ContributeToGoalCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Grid.Column="1"
+                                            Text="Edit"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditGoalCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Grid.Column="2"
+                                            Text="Delete"
+                                            BackgroundColor="Crimson"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteGoalCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

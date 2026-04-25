@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BudgetBuddy.Views.BudgetPage"
+             Title="Budget">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Monthly Budget" FontSize="24" FontAttributes="Bold"/>
+                <Label Text="{Binding CurrentMonthLabel}"
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="6">
+                <Label Text="Spending limit for this month" FontSize="12"/>
+                <Entry Placeholder="0.00"
+                       Keyboard="Numeric"
+                       Text="{Binding MonthlyLimit}"/>
+                <Button Text="Save Budget" Command="{Binding SaveBudgetCommand}"/>
+            </VerticalStackLayout>
+
+            <Border Padding="18"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                    StrokeThickness="1"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+
+                    <Grid ColumnDefinitions="*,*">
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Spent" FontSize="12"/>
+                            <Label Text="{Binding TotalSpent, StringFormat='{0:C}'}" FontSize="20" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Remaining" FontSize="12"/>
+                            <!-- Green when within budget -->
+                            <Label Text="{Binding Remaining, StringFormat='{0:C}'}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   IsVisible="{Binding IsOverBudget, Converter={StaticResource InvertBoolConverter}}"
+                                   TextColor="{AppThemeBinding Light=Green, Dark=LightGreen}"/>
+                            <!-- Red when over budget -->
+                            <Label Text="{Binding Remaining, StringFormat='{0:C}'}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   IsVisible="{Binding IsOverBudget}"
+                                   TextColor="Crimson"/>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Normal progress bar (within budget) -->
+                    <ProgressBar Progress="{Binding Progress}"
+                                 HeightRequest="10"
+                                 IsVisible="{Binding IsOverBudget, Converter={StaticResource InvertBoolConverter}}"
+                                 ProgressColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                    <!-- Red progress bar (over budget) -->
+                    <ProgressBar Progress="{Binding Progress}"
+                                 HeightRequest="10"
+                                 IsVisible="{Binding IsOverBudget}"
+                                 ProgressColor="Crimson"/>
+
+                    <Label Text="You are over your monthly budget."
+                           IsVisible="{Binding IsOverBudget}"
+                           TextColor="Crimson"
+                           FontAttributes="Bold"/>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
